@@ -112,6 +112,13 @@ class PineconeDocumentStoreError(DocumentStoreError):
         super().__init__(message=message)
 
 
+class AstraDocumentStoreError(DocumentStoreError):
+    """Exception for issues that occur in an Astra document store"""
+
+    def __init__(self, message: Optional[str] = None):
+        super().__init__(message=message)
+
+
 class DuplicateDocumentError(DocumentStoreError, ValueError):
     """Exception for Duplicate document"""
 
