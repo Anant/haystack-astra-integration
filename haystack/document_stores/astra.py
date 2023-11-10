@@ -1,7 +1,7 @@
-import copy
 import json
 import logging
 import operator
+import requests
 from copy import deepcopy
 from datetime import datetime
 from functools import reduce
@@ -70,25 +70,25 @@ class AstraDocumentStore(BaseDocumentStore):
     top_k_limit_vectors = 1_000
 
     def __init__(
-        self,
-        astra_id: str,
-        astra_application_token: str,
-        astra_region: str = "us-east1",
-        collection_name: Optional[str] = "haystack",
-        astra_keyspace: Optional[str] = None,
-        embedding_dim: int = 768,
-        return_embedding: bool = False,
-        index: str = "document",
-        similarity: str = "cosine",
-        replicas: int = 1,
-        shards: int = 1,
-        namespace: Optional[str] = None,
-        embedding_field: str = "embedding",
-        progress_bar: bool = True,
-        duplicate_documents: str = "overwrite",
-        recreate_collection: bool = False,
-        # metadata_config: Optional[Dict] = None, ## check if this is needed
-        validate_index_sync: bool = True,
+            self,
+            astra_id: str,
+            astra_application_token: str,
+            astra_region: str = "us-east1",
+            collection_name: Optional[str] = "haystack",
+            astra_keyspace: Optional[str] = None,
+            embedding_dim: int = 768,
+            return_embedding: bool = False,
+            index: str = "document",
+            similarity: str = "cosine",
+            replicas: int = 1,
+            shards: int = 1,
+            namespace: Optional[str] = None,
+            embedding_field: str = "embedding",
+            progress_bar: bool = True,
+            duplicate_documents: str = "overwrite",
+            recreate_collection: bool = False,
+            # metadata_config: Optional[Dict] = None, ## check if this is needed
+            validate_index_sync: bool = True,
     ):
         """
         :param astra_id: Astra database ID ([https://astra.datastax.com/](https://astra.datastax.com/)).
@@ -156,7 +156,6 @@ class AstraDocumentStore(BaseDocumentStore):
             "Content-Type": "application/json",
         }
 
-
         ## TODO: astra initialization here
         # pinecone.init(api_key=api_key, environment=environment)
         self._astra_id = astra_id
@@ -196,81 +195,79 @@ class AstraDocumentStore(BaseDocumentStore):
         super().__init__()
 
     def get_document_count(
-        self,
-        filters: Optional[FilterType] = None,
-        index: Optional[str] = None,
-        only_documents_without_embedding: bool = False,
-        headers: Optional[Dict[str, str]] = None,
-        namespace: Optional[str] = None,
-        type_metadata: Optional[DocTypeMetadata] = None,
+            self,
+            filters: Optional[FilterType] = None,
+            index: Optional[str] = None,
+            only_documents_without_embedding: bool = False,
+            headers: Optional[Dict[str, str]] = None,
+            namespace: Optional[str] = None,
+            type_metadata: Optional[DocTypeMetadata] = None,
     ) -> int:
         pass
 
     def get_embedding_count(
-        self, filters: Optional[FilterType] = None, index: Optional[str] = None, namespace: Optional[str] = None
+            self, filters: Optional[FilterType] = None, index: Optional[str] = None, namespace: Optional[str] = None
     ) -> int:
         pass
 
     def write_documents(
-        self,
-        documents: Union[List[dict], List[Document]],
-        index: Optional[str] = None,
-        batch_size: int = DEFAULT_BATCH_SIZE,
-        duplicate_documents: Optional[str] = None,
-        headers: Optional[Dict[str, str]] = None,
-        labels: Optional[bool] = False,
-        namespace: Optional[str] = None,
+            self,
+            documents: Union[List[dict], List[Document]],
+            index: Optional[str] = None,
+            batch_size: int = DEFAULT_BATCH_SIZE,
+            duplicate_documents: Optional[str] = None,
+            headers: Optional[Dict[str, str]] = None,
+            labels: Optional[bool] = False,
+            namespace: Optional[str] = None,
     ):
         pass
 
-
     def update_embeddings(
-        self,
-        retriever: DenseRetriever,
-        index: Optional[str] = None,
-        update_existing_embeddings: bool = True,
-        filters: Optional[FilterType] = None,
-        batch_size: int = DEFAULT_BATCH_SIZE,
-        namespace: Optional[str] = None,
+            self,
+            retriever: DenseRetriever,
+            index: Optional[str] = None,
+            update_existing_embeddings: bool = True,
+            filters: Optional[FilterType] = None,
+            batch_size: int = DEFAULT_BATCH_SIZE,
+            namespace: Optional[str] = None,
     ):
         pass
 
     def get_all_documents(
-        self,
-        index: Optional[str] = None,
-        filters: Optional[FilterType] = None,
-        return_embedding: Optional[bool] = None,
-        batch_size: int = DEFAULT_BATCH_SIZE,
-        headers: Optional[Dict[str, str]] = None,
-        type_metadata: Optional[DocTypeMetadata] = None,
-        namespace: Optional[str] = None,
+            self,
+            index: Optional[str] = None,
+            filters: Optional[FilterType] = None,
+            return_embedding: Optional[bool] = None,
+            batch_size: int = DEFAULT_BATCH_SIZE,
+            headers: Optional[Dict[str, str]] = None,
+            type_metadata: Optional[DocTypeMetadata] = None,
+            namespace: Optional[str] = None,
     ) -> List[Document]:
         pass
 
     def get_all_documents_generator(
-        self,
-        index: Optional[str] = None,
-        filters: Optional[FilterType] = None,
-        return_embedding: Optional[bool] = None,
-        batch_size: int = DEFAULT_BATCH_SIZE,
-        headers: Optional[Dict[str, str]] = None,
-        namespace: Optional[str] = None,
-        type_metadata: Optional[DocTypeMetadata] = None,
-        include_type_metadata: Optional[bool] = False,
+            self,
+            index: Optional[str] = None,
+            filters: Optional[FilterType] = None,
+            return_embedding: Optional[bool] = None,
+            batch_size: int = DEFAULT_BATCH_SIZE,
+            headers: Optional[Dict[str, str]] = None,
+            namespace: Optional[str] = None,
+            type_metadata: Optional[DocTypeMetadata] = None,
+            include_type_metadata: Optional[bool] = False,
     ) -> Generator[Document, None, None]:
 
-       pass
-
+        pass
 
     def get_documents_by_id(
-        self,
-        ids: List[str],
-        index: Optional[str] = None,
-        batch_size: int = DEFAULT_BATCH_SIZE,
-        headers: Optional[Dict[str, str]] = None,
-        return_embedding: Optional[bool] = None,
-        namespace: Optional[str] = None,
-        include_type_metadata: Optional[bool] = False,
+            self,
+            ids: List[str],
+            index: Optional[str] = None,
+            batch_size: int = DEFAULT_BATCH_SIZE,
+            headers: Optional[Dict[str, str]] = None,
+            return_embedding: Optional[bool] = None,
+            namespace: Optional[str] = None,
+            include_type_metadata: Optional[bool] = False,
     ) -> List[Document]:
         """
         Retrieves all documents in the index using their IDs.
@@ -288,12 +285,12 @@ class AstraDocumentStore(BaseDocumentStore):
         pass
 
     def get_document_by_id(
-        self,
-        id: str,
-        index: Optional[str] = None,
-        headers: Optional[Dict[str, str]] = None,
-        return_embedding: Optional[bool] = None,
-        namespace: Optional[str] = None,
+            self,
+            id: str,
+            index: Optional[str] = None,
+            headers: Optional[Dict[str, str]] = None,
+            return_embedding: Optional[bool] = None,
+            namespace: Optional[str] = None,
     ) -> Document:
         """
         Returns a single Document retrieved using an ID.
@@ -318,21 +315,49 @@ class AstraDocumentStore(BaseDocumentStore):
         pass
 
     def delete_documents(
-        self,
-        index: Optional[str] = None,
-        ids: Optional[List[str]] = None,
-        filters: Optional[FilterType] = None,
-        headers: Optional[Dict[str, str]] = None,
-        drop_ids: Optional[bool] = True,
-        namespace: Optional[str] = None,
-        type_metadata: Optional[DocTypeMetadata] = None,
+            self,
+            index: Optional[str] = None,
+            ids: Optional[List[str]] = None,
+            filters: Optional[FilterType] = None,
+            headers: Optional[Dict[str, str]] = None,
+            drop_ids: Optional[bool] = True,  # not part of the abstractmethod
+            namespace: Optional[str] = None,  # not part of the abstractmethod
+            type_metadata: Optional[DocTypeMetadata] = None,  # not part of the abstractmethod
     ):
         """
         Delete documents from the document store.
         """
-        pass
+        if ids is None and filters is None:
+            # Delete all
+            logger.info(
+                f"Deleting all documents in namespace {namespace}"
+            )
+            self._delete_vectors(_delete_all=True)
+        else:
+            logger.info(
+                f"Deleting {len(ids)} documents in namespace {namespace}"
+            )
+            self._delete_vectors(ids=ids, _delete_all=False)
 
-
+    def _delete_vectors(
+            self,
+            ids: Optional[List[str]] = None,
+            _delete_all: Optional[bool] = None,
+            filters: Optional[Dict[str, Union[str, float, int, bool, List, dict]]] = None,
+    ) -> Dict[str, Any]:
+        if ids is not None:
+            query = {"deleteMany": {"filter": {"_id": {"$in": ids}}}}
+        if filters is not None:
+            query = {"deleteMany": {"filter": filters}}
+        if _delete_all:
+            query = {"deleteMany": {}}
+        response = requests.request(
+            "POST",
+            self.request_url,
+            headers=self.request_header,
+            data=json.dumps(query),
+        )
+        return response.json()
 
     def delete_index(self, index: Optional[str]):
         """
@@ -344,21 +369,20 @@ class AstraDocumentStore(BaseDocumentStore):
         pass
 
     def query_by_embedding(
-        self,
-        query_emb: np.ndarray,
-        filters: Optional[FilterType] = None,
-        top_k: int = 10,
-        index: Optional[str] = None,
-        return_embedding: Optional[bool] = None,
-        headers: Optional[Dict[str, str]] = None,
-        scale_score: bool = True,
-        namespace: Optional[str] = None,
-        type_metadata: Optional[DocTypeMetadata] = None,
+            self,
+            query_emb: np.ndarray,
+            filters: Optional[FilterType] = None,
+            top_k: int = 10,
+            index: Optional[str] = None,
+            return_embedding: Optional[bool] = None,
+            headers: Optional[Dict[str, str]] = None,
+            scale_score: bool = True,
+            namespace: Optional[str] = None,
+            type_metadata: Optional[DocTypeMetadata] = None,
     ) -> List[Document]:
 
         return_documents = []
         return return_documents
-
 
     @classmethod
     def load(cls):
@@ -368,22 +392,22 @@ class AstraDocumentStore(BaseDocumentStore):
         raise NotImplementedError("load method not supported for PineconeDocumentStore")
 
     def delete_labels(
-        self,
-        index: Optional[str] = None,
-        ids: Optional[List[str]] = None,
-        filters: Optional[FilterType] = None,
-        headers: Optional[Dict[str, str]] = None,
-        batch_size: int = DEFAULT_BATCH_SIZE,
-        namespace: Optional[str] = None,
+            self,
+            index: Optional[str] = None,
+            ids: Optional[List[str]] = None,
+            filters: Optional[FilterType] = None,
+            headers: Optional[Dict[str, str]] = None,
+            batch_size: int = DEFAULT_BATCH_SIZE,
+            namespace: Optional[str] = None,
     ):
         pass
 
     def get_all_labels(
-        self,
-        index=None,
-        filters: Optional[FilterType] = None,
-        headers: Optional[Dict[str, str]] = None,
-        namespace: Optional[str] = None,
+            self,
+            index=None,
+            filters: Optional[FilterType] = None,
+            headers: Optional[Dict[str, str]] = None,
+            namespace: Optional[str] = None,
     ):
         """
         Default class method used for getting all labels.
@@ -397,7 +421,7 @@ class AstraDocumentStore(BaseDocumentStore):
         raise NotImplementedError("Labels are not supported by PineconeDocumentStore.")
 
     def write_labels(
-        self, labels, index=None, headers: Optional[Dict[str, str]] = None, namespace: Optional[str] = None
+            self, labels, index=None, headers: Optional[Dict[str, str]] = None, namespace: Optional[str] = None
     ):
         """
         Default class method used for writing labels.
